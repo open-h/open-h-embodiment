@@ -21,7 +21,6 @@ The script performs comprehensive checks on:
 - Required features and naming conventions
 - Healthcare-specific metadata
 - Data quality metrics (fps, resolution, synchronization)
-- Documentation completeness
 - Recovery/failure example handling
 """
 
@@ -41,24 +40,20 @@ import numpy as np
 os.environ["OPENCV_FFMPEG_LOGLEVEL"] = "-8"
 os.environ["FFMPEG_HIDE_BANNER"] = "1"
 
-try:
-    import cv2
+import cv2
+from importlib.metadata import version as get_version
 
-    CV2_AVAILABLE = True
-except ImportError:
-    CV2_AVAILABLE = False
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
+from lerobot.constants import HF_LEROBOT_HOME
 
-# Try to import LeRobot components
-try:
-    from lerobot.datasets.lerobot_dataset import LeRobotDataset
-    from lerobot.constants import HF_LEROBOT_HOME
-
-    LEROBOT_AVAILABLE = True
-except ImportError:
-    LEROBOT_AVAILABLE = False
-    print("Warning: LeRobot not installed. Some validation checks will be skipped.")
-    print("Install with: pip install lerobot==0.3.3")
-
+REQUIRED_LEROBOT_VERSION = "0.3.3"
+_installed_version = get_version("lerobot")
+if _installed_version != REQUIRED_LEROBOT_VERSION:
+    raise ImportError(
+        f"lerobot version mismatch: installed {_installed_version}, "
+        f"expected {REQUIRED_LEROBOT_VERSION}. "
+        f"Install with: pip install lerobot=={REQUIRED_LEROBOT_VERSION}"
+    )
 
 class ValidationLevel(Enum):
     """Validation severity levels"""
@@ -286,31 +281,7 @@ class OpenHDatasetValidator:
                 category,
                 "README.md found in metadata directory",
             )
-            self._validate_readme_content(readme_path)
 
-    def _validate_readme_content(self, readme_path: Path):
-        """Validate README.md content for required sections"""
-        category = "Documentation"
-
-        with open(readme_path, "r", encoding="utf-8") as f:
-            content = f.read().lower()
-
-        required_sections = [
-            "synchronization",
-            "dataset description",
-            "collection procedure",
-            "robot",
-            "sensor",
-        ]
-
-        for section in required_sections:
-            if section not in content:
-                self.add_result(
-                    ValidationLevel.WARNING,
-                    category,
-                    f"README.md missing recommended section: '{section}'",
-                    "Ensure all important dataset details are documented",
-                )
 
     def validate_info_json(self):
         """Validate info.json content and Open-H requirements"""
@@ -511,15 +482,6 @@ class OpenHDatasetValidator:
         """Validate individual video file"""
         category = "Video Quality"
 
-        if not CV2_AVAILABLE:
-            self.add_result(
-                ValidationLevel.INFO,
-                category,
-                f"OpenCV not installed - skipping detailed video validation for '{video_path.name}'",
-                "Install with: pip install opencv-python",
-            )
-            return
-
         try:
             cap = cv2.VideoCapture(str(video_path))
             if not cap.isOpened():
@@ -678,29 +640,17 @@ class OpenHDatasetValidator:
         """Validate dataset can be loaded with LeRobot locally"""
         category = "LeRobot Compatibility"
 
-        if not LEROBOT_AVAILABLE:
-            self.add_result(
-                ValidationLevel.WARNING,
-                category,
-                "LeRobot not installed - skipping compatibility check",
-                "Install with: pip install lerobot==0.3.3",
-            )
-            return
-
         try:
             # Load dataset from local path only - no remote access
-            # This validates the dataset structure is compatible with LeRobot
-            from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
 
-            # Create a mock repo_id for local loading
-            repo_id = f"local/{self.dataset_path.name}"
+            # Create repo_id in the form: parent_folder/child_folder
+            repo_id = "/".join(str(self.dataset_path).split("/")[-2:])
 
             # Try to load the dataset locally without any remote access
             # Set local_files_only=True to prevent any HuggingFace API calls
             dataset = LeRobotDataset(
                 repo_id,
-                root=self.dataset_path.parent,
-                local_files_only=True,
+                root=str(self.dataset_path),
                 video_backend="pytorch",
             )
 
@@ -725,46 +675,15 @@ class OpenHDatasetValidator:
                     ValidationLevel.SUCCESS, category, "Dataset features accessible"
                 )
 
-        except ImportError:
-            # Fallback if import path changed
-            try:
-                dataset = LeRobotDataset(
-                    repo_id=f"local/{self.dataset_path.name}",
-                    root=self.dataset_path.parent,
-                    video_backend="pytorch",
-                )
-                self.add_result(
-                    ValidationLevel.SUCCESS,
-                    category,
-                    "Dataset structure is compatible with LeRobot",
-                )
-            except Exception as e:
-                # Only validate structure, not actual loading
-                self._validate_lerobot_structure()
-
         except Exception as e:
-            # If LeRobot fails to load, validate structure manually
-            if (
-                "401" in str(e)
-                or "Repository Not Found" in str(e)
-                or "authentication" in str(e)
-            ):
-                # This means LeRobot tried to access remote - validate structure instead
-                self.add_result(
-                    ValidationLevel.INFO,
-                    category,
-                    "Skipping LeRobot loading test (would require remote access)",
-                    "Dataset structure validation performed instead",
-                )
-                self._validate_lerobot_structure()
-            else:
-                self.add_result(
-                    ValidationLevel.WARNING,
-                    category,
-                    f"Could not validate with LeRobot library: {str(e)[:100]}",
-                    "Manual structure validation performed instead",
-                )
-                self._validate_lerobot_structure()
+            self.add_result(
+                ValidationLevel.ERROR,
+                category,
+                f"Error loading dataset: {e}",
+            )
+            # Only validate structure, not actual loading
+            self._validate_lerobot_structure()
+
 
     def _validate_lerobot_structure(self):
         """Manually validate LeRobot dataset structure without loading"""
