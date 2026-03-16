@@ -7,7 +7,7 @@
 [![Discord](https://img.shields.io/badge/Discord-Join%20our%20community-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/YZEhNcTHtc)
 [![LeRobot](https://img.shields.io/badge/LeRobot-v0.3.3-FF6B6B?style=for-the-badge)](https://docs.phospho.ai/learn/lerobot-dataset)
 [![License](https://img.shields.io/badge/License-CC%20BY%204.0-4CAF50?style=for-the-badge)](https://creativecommons.org/licenses/by/4.0/)
-[![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-live-yellow?style=for-the-badge&logo=huggingface)](https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-Open-H-Embodiment)
+[![Hugging Face Dataset](https://img.shields.io/static/v1?label=Hugging%20Face&message=Dataset%20live&color=yellow&style=for-the-badge&logo=huggingface)](https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-Open-H-Embodiment)
 
 </div>
 
