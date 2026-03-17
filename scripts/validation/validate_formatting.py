@@ -593,6 +593,354 @@ class OpenHDatasetValidator:
                 ValidationLevel.ERROR, category, f"Error reading episodes.jsonl: {e}"
             )
 
+    def validate_timestamps(self):
+        """Validate timestamp column in episode parquet files.
+
+        Checks for issues known to cause training/inference failures in
+        downstream models:
+        - Absolute Unix epoch timestamps stored as float32 (precision collapse)
+        - Constant or near-constant timestamps across an episode
+        - Non-monotonic timestamps
+        - Non-strictly-monotonic timestamps (duplicate values)
+        - Unreasonable spacing relative to declared FPS
+        - Timestamps not relative to episode start
+        """
+        category = "Timestamps"
+        data_dir = self.dataset_path / "data"
+
+        if not data_dir.exists():
+            self.add_result(
+                ValidationLevel.ERROR, category, "Data directory not found, cannot validate timestamps"
+            )
+            return
+
+        try:
+            import pandas as pd
+        except ImportError:
+            self.add_result(
+                ValidationLevel.INFO,
+                category,
+                "pandas not installed — skipping timestamp validation",
+                "Install with: pip install pandas pyarrow",
+            )
+            return
+
+        # Read FPS from info.json for spacing checks
+        fps = None
+        info_path = self.dataset_path / "meta" / "info.json"
+        if info_path.exists():
+            try:
+                with open(info_path, "r", encoding="utf-8") as f:
+                    info = json.load(f)
+                raw_fps = info.get("fps")
+                if raw_fps is not None:
+                    try:
+                        fps = float(raw_fps)
+                        if fps <= 0:
+                            self.add_result(
+                                ValidationLevel.WARNING,
+                                category,
+                                f"Invalid fps value in info.json: {raw_fps}. "
+                                "Skipping FPS-dependent timestamp checks.",
+                            )
+                            fps = None
+                    except (TypeError, ValueError):
+                        self.add_result(
+                            ValidationLevel.WARNING,
+                            category,
+                            f"Non-numeric fps value in info.json: {raw_fps}. "
+                            "Skipping FPS-dependent timestamp checks.",
+                        )
+                        fps = None
+            except (json.JSONDecodeError, KeyError):
+                pass
+
+        chunk_dirs = sorted(data_dir.glob("chunk-*"))
+        if not chunk_dirs:
+            return
+
+        parquet_files = []
+        for chunk_dir in chunk_dirs:
+            parquet_files.extend(sorted(chunk_dir.glob("episode_*.parquet")))
+
+        if not parquet_files:
+            return
+
+        files_to_check = parquet_files
+
+        episodes_checked = 0
+        episodes_with_errors = 0
+        episodes_with_warnings = 0
+        issue_summary = {
+            "epoch_timestamps": [],
+            "constant_timestamps": [],
+            "low_uniqueness": [],
+            "non_monotonic": [],
+            "non_strictly_monotonic": [],
+            "bad_spacing": [],
+            "not_relative": [],
+        }
+
+        for pf in files_to_check:
+            try:
+                df = pd.read_parquet(pf, engine="pyarrow")
+            except Exception as e:
+                self.add_result(
+                    ValidationLevel.WARNING,
+                    category,
+                    f"Could not read {pf.name}: {e}",
+                )
+                continue
+
+            if "timestamp" not in df.columns:
+                self.add_result(
+                    ValidationLevel.ERROR,
+                    category,
+                    f"{pf.name}: missing 'timestamp' column",
+                )
+                episodes_with_errors += 1
+                continue
+
+            ts_series = df["timestamp"]
+            if not np.issubdtype(ts_series.dtype, np.number):
+                self.add_result(
+                    ValidationLevel.ERROR,
+                    category,
+                    f"{pf.name}: timestamp column has non-numeric dtype ({ts_series.dtype})",
+                )
+                episodes_with_errors += 1
+                continue
+
+            ts = pd.to_numeric(ts_series, errors="coerce").to_numpy(dtype=np.float64)
+            non_finite_count = int(np.sum(~np.isfinite(ts)))
+            if non_finite_count > 0:
+                self.add_result(
+                    ValidationLevel.ERROR,
+                    category,
+                    f"{pf.name}: timestamp contains {non_finite_count} NaN/Inf value(s)",
+                )
+                episodes_with_errors += 1
+                continue
+
+            episodes_checked += 1
+            n = len(ts)
+            ep_name = pf.stem
+            has_error = False
+            has_warning = False
+
+            if n < 2:
+                continue
+
+            # --- Check 1: Absolute Unix epoch timestamps ---
+            # float32 can only represent ~7 significant digits; Unix epoch
+            # values (~1.7e9) lose all sub-second precision, collapsing
+            # per-frame deltas to zero.
+            if ts[0] > 1e6:
+                issue_summary["epoch_timestamps"].append(ep_name)
+                is_float32 = df["timestamp"].dtype == np.float32
+                if is_float32:
+                    self.add_result(
+                        ValidationLevel.ERROR,
+                        category,
+                        f"{ep_name}: timestamps are absolute Unix epoch values "
+                        f"(ts[0]={ts[0]:.1f}) stored as float32 — precision collapse "
+                        f"makes per-frame deltas invisible to downstream models",
+                        "Convert to relative timestamps (subtract episode start time) "
+                        "or store as float64",
+                    )
+                    has_error = True
+                else:
+                    self.add_result(
+                        ValidationLevel.WARNING,
+                        category,
+                        f"{ep_name}: timestamps appear to be absolute Unix epoch values "
+                        f"(ts[0]={ts[0]:.1f}) — downstream models expect relative timestamps "
+                        f"starting near 0",
+                        "Consider converting to relative timestamps (subtract episode start time)",
+                    )
+                    has_warning = True
+                    issue_summary["not_relative"].append(ep_name)
+
+            # --- Check 2: Constant or near-constant timestamps ---
+            ts_min = float(np.min(ts))
+            ts_max = float(np.max(ts))
+            ts_range = ts_max - ts_min
+            expected_duration = (n - 1) / fps if fps else None
+
+            if ts_range == 0:
+                issue_summary["constant_timestamps"].append(ep_name)
+                self.add_result(
+                    ValidationLevel.ERROR,
+                    category,
+                    f"{ep_name}: all {n} timestamps are identical ({ts[0]:.6f}) — "
+                    f"video frame selection will always return frame 0",
+                )
+                has_error = True
+            elif expected_duration and ts_range < expected_duration * 0.01:
+                issue_summary["constant_timestamps"].append(ep_name)
+                self.add_result(
+                    ValidationLevel.ERROR,
+                    category,
+                    f"{ep_name}: timestamp range ({ts_range:.2e}s) is negligible "
+                    f"compared to expected episode duration ({expected_duration:.2f}s at {fps} fps) "
+                    f"— effectively constant",
+                )
+                has_error = True
+
+            # --- Check 3: Uniqueness ---
+            num_unique = len(np.unique(ts))
+            uniqueness_ratio = num_unique / n
+
+            if num_unique == 1 and n > 1:
+                pass  # already reported in constant check
+            elif uniqueness_ratio < 0.5:
+                issue_summary["low_uniqueness"].append(ep_name)
+                self.add_result(
+                    ValidationLevel.ERROR,
+                    category,
+                    f"{ep_name}: only {num_unique}/{n} unique timestamp values "
+                    f"({uniqueness_ratio:.1%}) — most frames share timestamps, "
+                    f"causing incorrect video frame lookups",
+                )
+                has_error = True
+            elif uniqueness_ratio < 1.0:
+                issue_summary["non_strictly_monotonic"].append(ep_name)
+                num_duplicates = n - num_unique
+                self.add_result(
+                    ValidationLevel.WARNING,
+                    category,
+                    f"{ep_name}: {num_duplicates} duplicate timestamp value(s) "
+                    f"({num_unique}/{n} unique, {uniqueness_ratio:.1%}) — "
+                    f"ideally each frame should have a distinct timestamp",
+                )
+                has_warning = True
+
+            # --- Check 4: Monotonicity ---
+            diffs = np.diff(ts)
+            num_decreasing = int(np.sum(diffs < 0))
+            if num_decreasing > 0:
+                issue_summary["non_monotonic"].append(ep_name)
+                first_decrease_idx = int(np.argmax(diffs < 0))
+                self.add_result(
+                    ValidationLevel.ERROR,
+                    category,
+                    f"{ep_name}: timestamps are NOT monotonically increasing — "
+                    f"{num_decreasing} decrease(s) found "
+                    f"(first at index {first_decrease_idx}: "
+                    f"{ts[first_decrease_idx]:.6f} -> {ts[first_decrease_idx+1]:.6f})",
+                )
+                has_error = True
+
+            # --- Check 5: Spacing relative to FPS ---
+            if fps and ts_range > 0 and num_unique > 1:
+                expected_spacing = 1.0 / fps
+                positive_diffs = diffs[diffs > 0]
+                if len(positive_diffs) > 0:
+                    mean_spacing = float(np.mean(positive_diffs))
+                    ratio = mean_spacing / expected_spacing
+                    if ratio > 5.0 or ratio < 0.1:
+                        issue_summary["bad_spacing"].append(ep_name)
+                        self.add_result(
+                            ValidationLevel.WARNING,
+                            category,
+                            f"{ep_name}: mean timestamp spacing ({mean_spacing:.4f}s) "
+                            f"deviates significantly from expected 1/{fps}={expected_spacing:.4f}s "
+                            f"(ratio: {ratio:.1f}x)",
+                            "This may indicate timestamps in wrong units or from a "
+                            "different clock source",
+                        )
+                        has_warning = True
+
+            # --- Check 6: Relative timestamps (should start near 0) ---
+            if 0 < ts[0] <= 1e6:
+                if ts[0] > 60.0:
+                    issue_summary["not_relative"].append(ep_name)
+                    self.add_result(
+                        ValidationLevel.WARNING,
+                        category,
+                        f"{ep_name}: first timestamp is {ts[0]:.2f}s — "
+                        f"timestamps may not be relative to episode start",
+                        "LeRobot defaults to frame_index/fps (starting at 0.0) when "
+                        "no explicit timestamp is provided; most datasets follow this convention",
+                    )
+                    has_warning = True
+
+            if has_error:
+                episodes_with_errors += 1
+            elif has_warning:
+                episodes_with_warnings += 1
+
+        # --- Aggregate summary ---
+        if episodes_checked == 0:
+            return
+
+        total_issues = episodes_with_errors + episodes_with_warnings
+        if total_issues == 0:
+            self.add_result(
+                ValidationLevel.SUCCESS,
+                category,
+                f"All {episodes_checked} checked episodes have valid timestamps "
+                f"(monotonically increasing, unique per frame, relative to episode start)",
+            )
+        else:
+            if episodes_with_errors > 0:
+                broken_types = []
+                if issue_summary["epoch_timestamps"]:
+                    broken_types.append(
+                        f"{len(issue_summary['epoch_timestamps'])} with absolute epoch values"
+                    )
+                if issue_summary["constant_timestamps"]:
+                    broken_types.append(
+                        f"{len(issue_summary['constant_timestamps'])} with constant/collapsed timestamps"
+                    )
+                if issue_summary["low_uniqueness"]:
+                    broken_types.append(
+                        f"{len(issue_summary['low_uniqueness'])} with very low uniqueness"
+                    )
+                if issue_summary["non_monotonic"]:
+                    broken_types.append(
+                        f"{len(issue_summary['non_monotonic'])} with non-monotonic values"
+                    )
+                self.add_result(
+                    ValidationLevel.ERROR,
+                    category,
+                    f"Timestamp issues found in {episodes_with_errors}/{episodes_checked} "
+                    f"checked episodes: {'; '.join(broken_types)}",
+                    "Broken timestamps may cause downstream models "
+                    "to always select the same video frame, "
+                    "producing static/frozen training data. Fix the dataset's "
+                    "timestamp column or ensure the training pipeline has a "
+                    "fallback (e.g. frame_index / fps).",
+                )
+
+            if episodes_with_warnings > 0:
+                warn_types = []
+                if issue_summary["non_strictly_monotonic"]:
+                    warn_types.append(
+                        f"{len(issue_summary['non_strictly_monotonic'])} with duplicate timestamps"
+                    )
+                if issue_summary["bad_spacing"]:
+                    warn_types.append(
+                        f"{len(issue_summary['bad_spacing'])} with unexpected spacing"
+                    )
+                if issue_summary["not_relative"]:
+                    warn_types.append(
+                        f"{len(issue_summary['not_relative'])} with non-relative timestamps"
+                    )
+                if warn_types:
+                    self.add_result(
+                        ValidationLevel.WARNING,
+                        category,
+                        f"Timestamp warnings in {episodes_with_warnings}/{episodes_checked} "
+                        f"checked episodes: {'; '.join(warn_types)}",
+                    )
+
+        self.add_result(
+            ValidationLevel.INFO,
+            category,
+            f"Checked {episodes_checked} episode parquet file(s) for timestamp integrity.",
+        )
+
     def validate_data_synchronization(self):
         """Check for data synchronization documentation and timestamps"""
         category = "Data Synchronization"
@@ -805,6 +1153,9 @@ class OpenHDatasetValidator:
 
         print("📝 Validating episodes...")
         self.validate_episodes()
+
+        print("🕐 Validating timestamps...")
+        self.validate_timestamps()
 
         print("⏱️ Validating synchronization...")
         self.validate_data_synchronization()
