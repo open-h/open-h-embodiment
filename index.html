@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="Open-H-Embodiment: A Large-Scale Dataset for Enabling Foundation Models in Medical Robotics">
+  <meta name="description" content="Open-H-Embodiment is the first large-scale, multi-institution, multi-robot open dataset for medical robot learning, comprising 770 hours across 48+ institutions and 20 robotic platforms.">
+  <meta name="keywords" content="medical robotics, surgical robotics, foundation models, open dataset, robot learning, VLA, world model, autonomous surgery, GR00T-H, Open-H">
+  <meta name="author" content="Open-H Consortium">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Open-H Consortium">
+  <meta property="og:title" content="Open-H-Embodiment: A Large-Scale Dataset for Enabling Foundation Models in Medical Robotics">
+  <meta property="og:description" content="The first large-scale, multi-institution, multi-robot open dataset for medical robot learning: 770 hours across 48+ institutions and 20 robotic platforms.">
+  <meta property="og:url" content="https://open-h.github.io">
+  <meta property="og:image" content="https://open-h.github.io/assets/static/images/open_h_overview.png">
+  <meta property="og:image:width" content="1420">
+  <meta property="og:image:height" content="793">
+  <meta property="og:image:alt" content="Open-H-Embodiment - Dataset Overview">
+  <meta property="article:published_time" content="2026-01-01T00:00:00.000Z">
+  <meta property="article:author" content="Open-H Consortium">
+  <meta property="article:section" content="Research">
+  <meta property="article:tag" content="medical robotics">
+  <meta property="article:tag" content="foundation models">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Open-H-Embodiment: A Large-Scale Dataset for Enabling Foundation Models in Medical Robotics">
+  <meta name="twitter:description" content="The first large-scale, multi-institution, multi-robot open dataset for medical robot learning: 770 hours across 48+ institutions and 20 robotic platforms.">
+  <meta name="twitter:image" content="https://open-h.github.io/assets/static/images/open_h_overview.png">
+  <meta name="twitter:image:alt" content="Open-H-Embodiment - Dataset Overview">
+
+  <!-- Academic/Research Specific -->
+  <meta name="citation_title" content="Open-H-Embodiment: A Large-Scale Dataset for Enabling Foundation Models in Medical Robotics">
+  <meta name="citation_author" content="Nelson, Nigel">
+  <meta name="citation_author" content="Chen, Juo-Tung">
+  <meta name="citation_author" content="Haworth, Jesse">
+  <meta name="citation_author" content="Chen, Xinhao">
+  <meta name="citation_author" content="Zbinden, Lukas">
+  <meta name="citation_author" content="Huang, Dianye">
+  <meta name="citation_publication_date" content="2026">
+  
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#2563eb">
+  <meta name="msapplication-TileColor" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://ajax.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <title>Open-H-Embodiment | A Large-Scale Dataset for Medical Robotics Foundation Models</title>
+  
+  <!-- Favicon and App Icons -->
+  <link rel="icon" type="image/png" href="assets/static/images/favicon.png">
+  <link rel="apple-touch-icon" href="assets/static/images/favicon.png">
+  
+  <!-- Critical CSS - Load synchronously -->
+  <link rel="stylesheet" href="assets/static/css/bulma.min.css">
+  <link rel="stylesheet" href="assets/static/css/index.css">
+  
+  <!-- Non-critical CSS - Load asynchronously -->
+  <link rel="preload" href="assets/static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="assets/static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="assets/static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  
+  <!-- Fallback for browsers that don't support preload -->
+  <noscript>
+    <link rel="stylesheet" href="assets/static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="assets/static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="assets/static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+  
+  <!-- Fonts - Optimized loading -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Defer non-critical JavaScript -->
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="assets/static/js/fontawesome.all.min.js"></script>
+  <script defer src="assets/static/js/bulma-carousel.min.js"></script>
+  <script defer src="assets/static/js/bulma-slider.min.js"></script>
+  <script defer src="assets/static/js/index.js"></script>
+  
+  <!-- Structured Data for Academic Papers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "Open-H-Embodiment: A Large-Scale Dataset for Enabling Foundation Models in Medical Robotics",
+    "description": "The first large-scale, multi-institution, multi-robot open dataset for medical robot learning, comprising 770 hours across 48+ institutions and 20 robotic platforms.",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Nigel Nelson",
+        "affiliation": { "@type": "Organization", "name": "NVIDIA" }
+      },
+      {
+        "@type": "Person",
+        "name": "Juo-Tung Chen",
+        "affiliation": { "@type": "Organization", "name": "Johns Hopkins University" }
+      },
+      {
+        "@type": "Person",
+        "name": "Jesse Haworth",
+        "affiliation": { "@type": "Organization", "name": "Johns Hopkins University" }
+      },
+      {
+        "@type": "Person",
+        "name": "Xinhao Chen",
+        "affiliation": { "@type": "Organization", "name": "Johns Hopkins University" }
+      },
+      {
+        "@type": "Person",
+        "name": "Lukas Zbinden",
+        "affiliation": { "@type": "Organization", "name": "NVIDIA" }
+      },
+      {
+        "@type": "Person",
+        "name": "Dianye Huang",
+        "affiliation": { "@type": "Organization", "name": "Technical University of Munich" }
+      }
+    ],
+    "datePublished": "2026",
+    "url": "https://open-h.github.io",
+    "image": "https://open-h.github.io/assets/static/images/open_h_overview.png",
+    "keywords": ["medical robotics", "foundation models", "surgical autonomy", "open dataset", "robot learning"],
+    "abstract": "We introduce Open-H-Embodiment, the first large-scale, multi-institution, multi-robot open dataset for medical robot learning, comprising synchronized video and kinematics collected across more than 48 institutions and 20 robotic platforms, spanning 770 hours of data.",
+    "isAccessibleForFree": true,
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "about": [
+      { "@type": "Thing", "name": "Medical Robotics" },
+      { "@type": "Thing", "name": "Foundation Models" }
+    ]
+  }
+  </script>
+  
+  <!-- Organization Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Open-H Consortium",
+    "url": "https://open-h.github.io",
+    "sameAs": [
+      "https://github.com/open-h/open-h-embodiment",
+      "https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-Open-H-Embodiment"
+    ]
+  }
+  </script>
+</head>
+<body>
+
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+
+  <!-- Hero Section: Title, Authors, Links -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">Open-H-Embodiment</h1>
+            <h2 class="subtitle is-4" style="color: var(--text-secondary); margin-top: -1rem; margin-bottom: 2rem; font-weight: 500;">A Large-Scale Dataset for Enabling Foundation Models in Medical Robotics</h2>
+
+            <!-- Consortium Authorship with Hover Expand -->
+            <div class="is-size-5 publication-authors">
+              <div class="consortium-author-wrapper">
+                <span class="consortium-label" id="consortiumToggle">
+                  <strong>Open-H Consortium</strong> <span class="consortium-hint">(hover to view full authorship)</span>
+                </span>
+                <div class="consortium-expanded" id="consortiumExpanded">
+                  <div class="latex-authors">
+                    <span class="author-name">Nigel Nelson<sup>7,&dagger;</sup></span>,
+                    <span class="author-name">Juo-Tung Chen<sup>9,&dagger;</sup></span>,
+                    <span class="author-name">Jesse Haworth<sup>9,&dagger;</sup></span>,
+                    <span class="author-name">Xinhao Chen<sup>9,&dagger;</sup></span>,
+                    <span class="author-name">Lukas Zbinden<sup>7,&dagger;</sup></span>,
+                    <span class="author-name">Dianye Huang<sup>39,&dagger;</sup></span>,
+                    <span class="author-name">Alaa Eldin Abdelaal<sup>1</sup></span>,
+                    <span class="author-name">Ayberk Acar<sup>37</sup></span>,
+                    <span class="author-name">Farshid Alambeigi<sup>2</sup></span>,
+                    <span class="author-name">Yunke Ao<sup>3,4,47</sup></span>,
+                    <span class="author-name">Pablo David Aranda Rodriguez<sup>5</sup></span>,
+                    <span class="author-name">Soofiyan Atar<sup>6</sup></span>,
+                    <span class="author-name">Mattia Ballo<sup>8</sup></span>,
+                    <span class="author-name">Noah Barnes<sup>9</sup></span>,
+                    <span class="author-name">Filip Binkiewicz<sup>10</sup></span>,
+                    <span class="author-name">Peter Black<sup>11,12</sup></span>,
+                    <span class="author-name">Sebastian Bodenstedt<sup>13,45</sup></span>,
+                    <span class="author-name">Leonardo Borgioli<sup>14</sup></span>,
+                    <span class="author-name">Nikola Budjak<sup>5</sup></span>,
+                    <span class="author-name">Benjamin Calm&eacute;<sup>38</sup></span>,
+                    <span class="author-name">Fabio Carrillo<sup>3</sup></span>,
+                    <span class="author-name">Nicola Cavalcanti<sup>3</sup></span>,
+                    <span class="author-name">Changwei Chen<sup>6</sup></span>,
+                    <span class="author-name">Haoxin Chen<sup>16</sup></span>,
+                    <span class="author-name">Sihang Chen<sup>15</sup></span>,
+                    <span class="author-name">Qihan Chen<sup>18</sup></span>,
+                    <span class="author-name">Zhongyu Chen<sup>17,48</sup></span>,
+                    <span class="author-name">Ziyang Chen<sup>19</sup></span>,
+                    <span class="author-name">Shing Shin Cheng<sup>17</sup></span>,
+                    <span class="author-name">Meiqing Cheng<sup>20</sup></span>,
+                    <span class="author-name">Min Cheng<sup>21,15</sup></span>,
+                    <span class="author-name">Zih-Yun Sarah Chiu<sup>9</sup></span>,
+                    <span class="author-name">Xiangyu Chu<sup>17,48</sup></span>,
+                    <span class="author-name">Camilo Correa-Gallego<sup>22</sup></span>,
+                    <span class="author-name">Giulio Dagnino<sup>23</sup></span>,
+                    <span class="author-name">Anton Deguet<sup>9</sup></span>,
+                    <span class="author-name">Jacob Delgado<sup>9</sup></span>,
+                    <span class="author-name">Jonathan C. DeLong<sup>24</sup></span>,
+                    <span class="author-name">Kaizhong Deng<sup>25</sup></span>,
+                    <span class="author-name">Alexander Dimitrakakis<sup>22</sup></span>,
+                    <span class="author-name">Qingpeng Ding<sup>17</sup></span>,
+                    <span class="author-name">Hao Ding<sup>9,26</sup></span>,
+                    <span class="author-name">Daniel Donoho<sup>27</sup></span>,
+                    <span class="author-name">Anqing Duan<sup>28</sup></span>,
+                    <span class="author-name">Marco Esposito<sup>5</sup></span>,
+                    <span class="author-name">Shane Farritor<sup>29</sup></span>,
+                    <span class="author-name">Jad Fayad<sup>30</sup></span>,
+                    <span class="author-name">Zahi Fayad<sup>22</sup></span>,
+                    <span class="author-name">Mario Ferradosa<sup>31</sup></span>,
+                    <span class="author-name">Filippo Filicori<sup>32</sup></span>,
+                    <span class="author-name">Chelsea Finn<sup>1,33</sup></span>,
+                    <span class="author-name">Philipp F&uuml;rnstahl<sup>3,34</sup></span>,
+                    <span class="author-name">Jiawei Ge<sup>9</sup></span>,
+                    <span class="author-name">Stamatia Giannarou<sup>25</sup></span>,
+                    <span class="author-name">Xavier Giralt Ludevid<sup>31</sup></span>,
+                    <span class="author-name">Frederic Giraud<sup>3</sup></span>,
+                    <span class="author-name">Aditya Amit Godbole<sup>35</sup></span>,
+                    <span class="author-name">Ken Goldberg<sup>19</sup></span>,
+                    <span class="author-name">Antony Goldenberg<sup>9</sup></span>,
+                    <span class="author-name">Diego Granero Marana<sup>10</sup></span>,
+                    <span class="author-name">Xiaoqing Guo<sup>16</sup></span>,
+                    <span class="author-name">Tam&aacute;s Haidegger<sup>36,46</sup></span>,
+                    <span class="author-name">Evan Hailey<sup>29</sup></span>,
+                    <span class="author-name">Pascal Hansen<sup>45</sup></span>,
+                    <span class="author-name">Kush Hari<sup>19</sup></span>,
+                    <span class="author-name">Jonathon Hawkins<sup>10</sup></span>,
+                    <span class="author-name">Shelby Haworth<sup>9</sup></span>,
+                    <span class="author-name">Ortrun Hellig<sup>13</sup></span>,
+                    <span class="author-name">S. Duke Herrell<sup>37</sup></span>,
+                    <span class="author-name">Zhouyang Hong<sup>17</sup></span>,
+                    <span class="author-name">Andrew Howe<sup>10</sup></span>,
+                    <span class="author-name">Junlei Hu<sup>38</sup></span>,
+                    <span class="author-name">Ria Jain<sup>19</sup></span>,
+                    <span class="author-name">Mohammad Rafiee Javazm<sup>2</sup></span>,
+                    <span class="author-name">Howard Ji<sup>1</sup></span>,
+                    <span class="author-name">Rui Ji<sup>40</sup></span>,
+                    <span class="author-name">Jianmin Ji<sup>15</sup></span>,
+                    <span class="author-name">Zhongliang Jiang<sup>41,39</sup></span>,
+                    <span class="author-name">Dominic Jones<sup>38</sup></span>,
+                    <span class="author-name">Jeffrey Jopling<sup>9</sup></span>,
+                    <span class="author-name">Britton Jordan<sup>37</sup></span>,
+                    <span class="author-name">Ran Ju<sup>41,21</sup></span>,
+                    <span class="author-name">Michael Kam<sup>9</sup></span>,
+                    <span class="author-name">Luoyao Kang<sup>17</sup></span>,
+                    <span class="author-name">Fausto Kang<sup>9</sup></span>,
+                    <span class="author-name">Siddhartha Kapuria<sup>2</sup></span>,
+                    <span class="author-name">Peter Kazanzides<sup>9</sup></span>,
+                    <span class="author-name">Sonika Kiehler<sup>2</sup></span>,
+                    <span class="author-name">Ethan Kilmer<sup>9</sup></span>,
+                    <span class="author-name">Ji Woong (Brian) Kim<sup>9,1</sup></span>,
+                    <span class="author-name">Przemys&#322;aw Korzeniowski<sup>7,8</sup></span>,
+                    <span class="author-name">Chandra Kuchi<sup>33</sup></span>,
+                    <span class="author-name">Nithesh Kumar<sup>37</sup></span>,
+                    <span class="author-name">Alan Kuntz<sup>37</sup></span>,
+                    <span class="author-name">Yu Chung Lee<sup>11</sup></span>,
+                    <span class="author-name">Hao-Chih Lee<sup>22</sup></span>,
+                    <span class="author-name">Hang Li<sup>17</sup></span>,
+                    <span class="author-name">Zhen Li<sup>40</sup></span>,
+                    <span class="author-name">Xiao Liang<sup>6</sup></span>,
+                    <span class="author-name">Xinxin Lin<sup>20</sup></span>,
+                    <span class="author-name">Jinsong Lin<sup>17</sup></span>,
+                    <span class="author-name">Chang Liu<sup>9</sup></span>,
+                    <span class="author-name">Fei Liu<sup>24</sup></span>,
+                    <span class="author-name">Pei Liu<sup>39</sup></span>,
+                    <span class="author-name">Yun-hui Liu<sup>17</sup></span>,
+                    <span class="author-name">Wanli Liuchen<sup>18</sup></span>,
+                    <span class="author-name">Eszter Luk&aacute;cs<sup>36,46</sup></span>,
+                    <span class="author-name">Sareena Mann<sup>19</sup></span>,
+                    <span class="author-name">Miles Mannas<sup>11,12</sup></span>,
+                    <span class="author-name">Brett Marinelli<sup>22</sup></span>,
+                    <span class="author-name">Sabina Martyniak<sup>8</sup></span>,
+                    <span class="author-name">Francesco Marzola<sup>23</sup></span>,
+                    <span class="author-name">Lorenzo Mazza<sup>13</sup></span>,
+                    <span class="author-name">Xueyan Mei<sup>22</sup></span>,
+                    <span class="author-name">Maria Clara Morais<sup>35</sup></span>,
+                    <span class="author-name">Chetan Reddy Narayanaswamy<sup>1</sup></span>,
+                    <span class="author-name">Micha&#322; Naskr&#281;t<sup>8</sup></span>,
+                    <span class="author-name">David Navarro-Alarcon<sup>18</sup></span>,
+                    <span class="author-name">Sayem Nazmuz<sup>11</sup></span>,
+                    <span class="author-name">Cyrus Neary<sup>11</sup></span>,
+                    <span class="author-name">Chi Kit Ng<sup>17</sup></span>,
+                    <span class="author-name">Christopher Nguan<sup>11,12</sup></span>,
+                    <span class="author-name">David Noonan<sup>30</sup></span>,
+                    <span class="author-name">Ki Hwan Oh<sup>14</sup></span>,
+                    <span class="author-name">Tom Christian Olesch<sup>24</sup></span>,
+                    <span class="author-name">Allison M. Okamura<sup>1</sup></span>,
+                    <span class="author-name">Justin Opfermann<sup>9</sup></span>,
+                    <span class="author-name">Matteo Pescio<sup>23</sup></span>,
+                    <span class="author-name">Doan Xuan Viet Pham<sup>9</sup></span>,
+                    <span class="author-name">Tito Porras<sup>26</sup></span>,
+                    <span class="author-name">Hongliang Ren<sup>17</sup></span>,
+                    <span class="author-name">Ariel Rodriguez Jimenez<sup>13</sup></span>,
+                    <span class="author-name">Ferdinando Rodriguez y Baena<sup>25</sup></span>,
+                    <span class="author-name">Septimiu E. Salcudean<sup>11</sup></span>,
+                    <span class="author-name">Asmitha Sathya<sup>9</sup></span>,
+                    <span class="author-name">Preethi Satish<sup>19</sup></span>,
+                    <span class="author-name">Lalithkumar Seenivasan<sup>9</sup></span>,
+                    <span class="author-name">Jiaqi Shao<sup>1</sup></span>,
+                    <span class="author-name">Yiqing Shen<sup>9,26</sup></span>,
+                    <span class="author-name">Yu Sheng<sup>15</sup></span>,
+                    <span class="author-name">Lucy XiaoYang Shi<sup>1,33</sup></span>,
+                    <span class="author-name">Zoe Soul&eacute;<sup>13</sup></span>,
+                    <span class="author-name">Stefanie Speidel<sup>13,45</sup></span>,
+                    <span class="author-name">Jianhao Su<sup>25</sup></span>,
+                    <span class="author-name">Idris Sunmola<sup>9</sup></span>,
+                    <span class="author-name">Krist&oacute;f Tak&aacute;cs<sup>36</sup></span>,
+                    <span class="author-name">Yunxi Tang<sup>17,48</sup></span>,
+                    <span class="author-name">Patrick Thornycroft<sup>10</sup></span>,
+                    <span class="author-name">Yu Tian<sup>17</sup></span>,
+                    <span class="author-name">Jordan Thompson<sup>37</sup></span>,
+                    <span class="author-name">Mehmet K. Turkcan<sup>42</sup></span>,
+                    <span class="author-name">Mathias Unberath<sup>9,26</sup></span>,
+                    <span class="author-name">Pietro Valdastri<sup>38</sup></span>,
+                    <span class="author-name">Carlos Vives<sup>31</sup></span>,
+                    <span class="author-name">Quan Vuong<sup>33</sup></span>,
+                    <span class="author-name">Martin Wagner<sup>13</sup></span>,
+                    <span class="author-name">Farong Wang<sup>24</sup></span>,
+                    <span class="author-name">Wei Wang<sup>20</sup></span>,
+                    <span class="author-name">Lidian Wang<sup>15</sup></span>,
+                    <span class="author-name">Chung-Pang Wang<sup>6</sup></span>,
+                    <span class="author-name">Junyi Wang<sup>41</sup></span>,
+                    <span class="author-name">Erqi Wang<sup>17</sup></span>,
+                    <span class="author-name">Ziyi Wang<sup>17</sup></span>,
+                    <span class="author-name">Tanner Watts<sup>37</sup></span>,
+                    <span class="author-name">Wolfgang Wein<sup>5</sup></span>,
+                    <span class="author-name">Yimeng Wu<sup>9</sup></span>,
+                    <span class="author-name">Zijian Wu<sup>11</sup></span>,
+                    <span class="author-name">Hongjun Wu<sup>9</sup></span>,
+                    <span class="author-name">Luohong Wu<sup>3</sup></span>,
+                    <span class="author-name">Jie Ying Wu<sup>37</sup></span>,
+                    <span class="author-name">Junlin Wu<sup>9</sup></span>,
+                    <span class="author-name">Victoria Wu<sup>30</sup></span>,
+                    <span class="author-name">Kaixuan Wu<sup>17</sup></span>,
+                    <span class="author-name">Mateusz W&oacute;jcikowski<sup>8</sup></span>,
+                    <span class="author-name">Yunye Xiao<sup>5</sup></span>,
+                    <span class="author-name">Nan Xiao<sup>24</sup></span>,
+                    <span class="author-name">Wenxuan Xie<sup>17</sup></span>,
+                    <span class="author-name">Hao Yang<sup>37</sup></span>,
+                    <span class="author-name">Tianqi Yang<sup>17,48</sup></span>,
+                    <span class="author-name">Yinuo Yang<sup>6</sup></span>,
+                    <span class="author-name">Menglong Ye<sup>30</sup></span>,
+                    <span class="author-name">Ryan S. Yeung<sup>11</sup></span>,
+                    <span class="author-name">Nural Yilmaz<sup>9</sup></span>,
+                    <span class="author-name">Chim Ho Yin<sup>17</sup></span>,
+                    <span class="author-name">Michael Yip<sup>6</sup></span>,
+                    <span class="author-name">Rayan Younis<sup>13</sup></span>,
+                    <span class="author-name">Chenhao Yu<sup>26</sup></span>,
+                    <span class="author-name">Milos Zefran<sup>14</sup></span>,
+                    <span class="author-name">Han Zhang<sup>9</sup></span>,
+                    <span class="author-name">Yuelin Zhang<sup>17</sup></span>,
+                    <span class="author-name">Yidong Zhang<sup>17</sup></span>,
+                    <span class="author-name">Yanyong Zhang<sup>15</sup></span>,
+                    <span class="author-name">Xuyang Zhang<sup>15</sup></span>,
+                    <span class="author-name">Yameng Zhang<sup>41,48</sup></span>,
+                    <span class="author-name">Joyce Zhang<sup>10</sup></span>,
+                    <span class="author-name">Ning Zhong<sup>40</sup></span>,
+                    <span class="author-name">Peng Zhou<sup>43</sup></span>,
+                    <span class="author-name">Haoying Zhou<sup>9,44</sup></span>,
+                    <span class="author-name">Xiuli Zuo<sup>40</sup></span>,
+                    <span class="author-name">Nassir Navab<sup>39,&Dagger;</sup></span>,
+                    <span class="author-name">Mahdi Azizian<sup>7,&Dagger;</sup></span>,
+                    <span class="author-name">Sean D. Huver<sup>7,&Dagger;</sup></span>,
+                    <span class="author-name">Axel Krieger<sup>9,26,&Dagger;</sup></span>
+                  </div>
+
+                  <div class="latex-affiliations">
+                    <sup>1</sup>Stanford University,
+                    <sup>2</sup>The University of Texas at Austin,
+                    <sup>3</sup>Balgrist University Hospital,
+                    <sup>4</sup>ETH Zurich,
+                    <sup>5</sup>ImFusion GmbH,
+                    <sup>6</sup>University of California San Diego,
+                    <sup>7</sup>NVIDIA,
+                    <sup>8</sup>Sano Centre for Computational Medicine,
+                    <sup>9</sup>Johns Hopkins University,
+                    <sup>10</sup>CMR Surgical,
+                    <sup>11</sup>University of British Columbia,
+                    <sup>12</sup>Vancouver General Hospital,
+                    <sup>13</sup>CeTI/TU Dresden,
+                    <sup>14</sup>University of Illinois Chicago,
+                    <sup>15</sup>University of Science and Technology of China,
+                    <sup>16</sup>Hong Kong Baptist University,
+                    <sup>17</sup>The Chinese University of Hong Kong,
+                    <sup>18</sup>The Hong Kong Polytechnic University,
+                    <sup>19</sup>University of California Berkeley,
+                    <sup>20</sup>Sun Yat-Sen University,
+                    <sup>21</sup>Tuodao Medical Technology Co., Ltd,
+                    <sup>22</sup>Icahn School of Medicine at Mount Sinai,
+                    <sup>23</sup>University of Turin,
+                    <sup>24</sup>University of Tennessee Knoxville,
+                    <sup>25</sup>Imperial College London,
+                    <sup>26</sup>Semaphor Surgical,
+                    <sup>27</sup>Surgical Data Science Collective,
+                    <sup>28</sup>Mohamed bin Zayed University of Artificial Intelligence,
+                    <sup>29</sup>Virtual Incision,
+                    <sup>30</sup>Moon Surgical,
+                    <sup>31</sup>Rob Surgical,
+                    <sup>32</sup>Hofstra/Northwell School of Medicine,
+                    <sup>33</sup>Physical Intelligence,
+                    <sup>34</sup>University of Zurich,
+                    <sup>35</sup>Northwell Health,
+                    <sup>36</sup>&Oacute;buda University,
+                    <sup>37</sup>Vanderbilt University,
+                    <sup>38</sup>University of Leeds,
+                    <sup>39</sup>Technical University of Munich,
+                    <sup>40</sup>Qilu Hospital of Shandong University,
+                    <sup>41</sup>The University of Hong Kong,
+                    <sup>42</sup>Columbia University,
+                    <sup>43</sup>Great Bay University,
+                    <sup>44</sup>Worcester Polytechnic Institute,
+                    <sup>45</sup>German Cancer Research Center,
+                    <sup>46</sup>Austrian Center for Medical Innovation and Technology,
+                    <sup>47</sup>ETH AI Center,
+                    <sup>48</sup>Multi-scale Medical Robotics Center
+                  </div>
+
+                  <div class="latex-footnotes">
+                    <sup>&dagger;</sup> Co-first authors. <sup>&Dagger;</sup> Co-senior authors.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Publication Links -->
+            <div class="column has-text-centered">
+              <div class="publication-links">
+
+                <!-- Dataset -->
+                <span class="link-block">
+                  <a href="https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-Open-H-Embodiment" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon" style="vertical-align: middle; font-size: 18px;">&#129303;</span>
+                    <span>Dataset</span>
+                  </a>
+                </span>
+
+                <!-- GR00T-H Weights -->
+                <span class="link-block">
+                  <a href="https://huggingface.co/nvidia/GR00T-H" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon" style="vertical-align: middle; font-size: 18px;">&#129303;</span>
+                    <span>GR00T-H Weights</span>
+                  </a>
+                </span>
+
+                <!-- GR00T-H Code -->
+                <span class="link-block">
+                  <a href="https://github.com/NVIDIA-Medtech/GR00T-H" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>GR00T-H Code</span>
+                  </a>
+                </span>
+
+                <!-- Cosmos-H-S-S Weights -->
+                <span class="link-block">
+                  <a href="https://huggingface.co/nvidia/Cosmos-H-Surgical-Simulator" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon" style="vertical-align: middle; font-size: 18px;">&#129303;</span>
+                    <span>Cosmos-H-S-S Weights</span>
+                  </a>
+                </span>
+
+                <!-- Cosmos-H-S-S Code -->
+                <span class="link-block">
+                  <a href="https://github.com/NVIDIA-Medtech/Cosmos-H-Surgical-Simulator" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Cosmos-H-S-S Code</span>
+                  </a>
+                </span>
+
+                <!-- Data Collection Repo -->
+                <span class="link-block">
+                  <a href="https://github.com/open-h/open-h-embodiment" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Data Collection</span>
+                  </a>
+                </span>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Teaser Video: Collage -->
+  <section class="hero teaser">
+    <div class="container is-max-widescreen">
+      <div class="hero-body">
+        <video poster="" id="collage-video" autoplay controls muted loop height="100%" preload="metadata" style="border-radius: var(--border-radius-lg); box-shadow: var(--shadow-xl); width: 100%;">
+          <source src="assets/static/videos/collage_vid.mp4" type="video/mp4">
+        </video>
+        <h2 class="subtitle has-text-centered" style="margin-top: 1rem;">
+          A snapshot of the Open-H-Embodiment dataset: 770 hours of synchronized video and kinematics across 20 robotic platforms and 48+ institutions worldwide.
+        </h2>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Autonomous medical robots hold promise in improving patient outcomes by reducing provider fatigue and workload, democratizing access to surgical care, and enabling super-human precision. However, progress in autonomous medical robotics has been limited by a fundamental data problem: existing robot demonstration datasets are small, collected on single platforms, and rarely shared openly, restricting not just policy learning but the broader ecosystem of foundation models, simulation tools, and benchmarks that the field needs to advance.
+            </p>
+            <p>
+              We introduce <strong>Open-H-Embodiment</strong>, the first large-scale, multi-institution, multi-robot open dataset for medical robot learning, comprising synchronized video and kinematics collected across more than <strong>48 institutions</strong> and multiple robotic platforms including the CMR Versius, Intuitive Surgical's da Vinci, da Vinci Research Kit (dVRK), Rob Surgical BiTrack, Virtual Incision's MIRA, Moon Surgical Maestro, and a variety of custom systems, spanning surgical manipulation, robotic ultrasound, and endoscopy procedures.
+            </p>
+            <p>
+              We demonstrate the breadth of research enabled by this dataset through two foundation models. We train <strong>GR00T-H</strong>, the first open foundation vision-language-action model for medical robotics, which is the only evaluated model to achieve full end-to-end task completion on a structured suturing benchmark (25% of trials vs. 0% for all baselines) and achieves 65% average success across a 29-step ex vivo suturing sequence on skin-on pork belly. We also train <strong>Cosmos-H-Surgical-Simulator</strong>, the first kinematic action-conditioned world model to enable multi-embodiment surgical simulation from a single checkpoint, spanning nine robotic platforms and supporting in-silico policy evaluation and synthetic data generation for the surgical domain.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Figure 1: Open-H Overview -->
+  <section class="section hero is-small">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full">
+          <div class="content has-text-centered">
+            <h2 class="title is-3">Open-H-Embodiment Overview</h2>
+            <img src="assets/static/images/open_h_overview.png" alt="Open-H-Embodiment overview showing geographic distribution, robotic platforms, representative frames, and data composition" style="max-width: 100%; height: auto; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg);" loading="lazy" />
+            <p class="has-text-justified" style="margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
+              <strong>Figure 1:</strong> (A) Geographic distribution of the 48 participating institutions across North America, Europe, the Middle East, and Asia. (B) The 20 healthcare robotic platforms represented in the dataset, spanning surgical systems (da Vinci Si, da Vinci Xi, dVRK, dVRK-Si, MIRA, Versius, BiTrack, Maestro, Torin), general-purpose manipulators adapted for clinical use (Franka Panda, UR5e, Kuka Med 14), and emerging platforms. (C) Representative frames from the dataset illustrating the diversity of tasks, viewpoints, and tissue types covered, including robotic surgery, robotic ultrasound, and related healthcare manipulation tasks. (D) The dataset comprises 770 hours of synchronized multimodal demonstrations spanning language annotations, video observations, and kinematic trajectories. This corpus supports two downstream directions: training GR00T-H, a healthcare-focused vision-language-action model targeting surgical autonomy, and training Cosmos-H-Surgical-Simulator, a multi-embodiment, action-conditioned world model for surgical scene synthesis.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Dataset Statistics -->
+  <section class="section hero is-small is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full">
+          <div class="content has-text-centered">
+            <h2 class="title is-3">Dataset Composition</h2>
+            <img src="assets/static/images/dataset_composition.png" alt="Composition of the Open-H-Embodiment dataset showing hours by platform, environment, and task family" style="max-width: 100%; height: auto; border-radius: var(--border-radius-lg); box-shadow: var(--shadow-lg);" loading="lazy" />
+            <p class="has-text-justified" style="margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.95rem;">
+              <strong>Figure 2:</strong> (a) Dataset hours by robot platform. (b) Distribution of dataset hours by environment type. (c) Distribution of dataset hours across task families. Together, these panels summarize the current distribution of contributed data across embodiments, collection environments, and task families in Open-H-Embodiment.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Image Carousel: Experiment Results -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <h2 class="title is-3 has-text-centered">Experiment Results</h2>
+        <div id="results-carousel" class="carousel results-carousel">
+
+          <div class="item item-paired">
+            <div class="paired-grid">
+              <div class="paired-cell">
+                <img src="assets/static/images/subtask_survival_cascade.png" alt="End-to-end suturing task survival cascade" loading="lazy"/>
+              </div>
+              <div class="paired-cell">
+                <img src="assets/static/images/suturebot_generalization.png" alt="Out-of-distribution generalization on SutureBot" loading="lazy"/>
+              </div>
+            </div>
+            <h2 class="subtitle has-text-centered">
+              <strong>End-to-End Suturing &amp; OOD Generalization:</strong> Left: Task survival for GR00T-H on the SutureBot end-to-end suturing task compared to GR00T-N1.6, ACT, and LingBot-VA. GR00T-H improves end-to-end performance with long-horizon success rate of 25%, showing better handling of compounding errors. Right: Out-of-distribution evaluation on SutureBot with an unseen wound configuration under varied lighting (n = 20 per subtask). GR00T-H achieves a 3-task average of 54%, outperforming GR00T-N1.6 (30%) and ACT (5%). Clopper-Pearson 95% confidence intervals are represented as error bars.
+            </h2>
+          </div>
+
+          <div class="item item-paired">
+            <div class="paired-grid">
+              <div class="paired-cell">
+                <img src="assets/static/images/suturebot_33pct.png" alt="Data efficiency ablation at 33% fine-tuning data" loading="lazy"/>
+              </div>
+              <div class="paired-cell">
+                <img src="assets/static/images/suturebot_100pct.png" alt="Data efficiency ablation at 100% fine-tuning data" loading="lazy"/>
+              </div>
+            </div>
+            <h2 class="subtitle has-text-centered">
+              <strong>Data Efficiency (33% &amp; 100%):</strong> Task success rate at 33% and 100% fine-tuning data on SutureBot (n = 10 per subtask). At 33% data, GR00T-H matches ACT while GR00T-N1.6 underperforms both. At 100% data, GR00T-H outperforms all baselines, indicating that Open-H post-training enables both data-efficient learning and stronger scaling. Clopper-Pearson 95% confidence intervals are represented as error bars.
+            </h2>
+          </div>
+
+          <div class="item">
+            <img src="assets/static/images/multi_embodiment.png" alt="Multi-embodiment performance comparison across dVRK-Si, Versius, and MIRA" loading="lazy"/>
+            <h2 class="subtitle has-text-centered">
+              <strong>Multi-Embodiment Performance Comparison.</strong> Evaluation of the GR00T-H foundational VLA (post-trained on Open-H) versus the GR00T-N1.6 base policy across three surgical platforms: the da Vinci Research Kit Si (dVRK-Si), CMR Versius, and Virtual Incision MIRA. GR00T-H demonstrates significant performance gains across all robot embodiments and sub-tasks, with the overall average success rate showing a statistically significant improvement (p &lt; 0.001). Error bars represent the Clopper-Pearson 95% confidence intervals across trials.
+            </h2>
+          </div>
+
+          <div class="item">
+            <img src="assets/static/images/gr00th_ex_vivo_suturing.png" alt="GR00T-H ex vivo suturing evaluation across 29 subtasks" loading="lazy"/>
+            <h2 class="subtitle has-text-centered">
+              <strong>Ex Vivo Suturing:</strong> GR00T-H ex vivo suturing evaluation across 29 subtasks (n = 10 per subtask, n = 290 total). Tasks span needle manipulation, wound opening, suture passing, knot tying, and suture cutting. GR00T-H achieves an average success rate of &approx;65%, with near-perfect performance on structured manipulation primitives and lower success on fine-contact and cutting steps. The rightmost bar shows the overall average across all subtasks. Clopper-Pearson 95% confidence intervals are represented as error bars.
+            </h2>
+          </div>
+
+          <div class="item">
+            <img src="assets/static/images/chss_l1_ssim.png" alt="Cosmos-H-Surgical-Simulator quantitative evaluation: L1 and SSIM for benchtop vs. tissue-based datasets" loading="lazy"/>
+            <h2 class="subtitle has-text-centered">
+              <strong>Cosmos-H-S-S Evaluation:</strong> Quantitative evaluation of Cosmos-H-Surgical-Simulator. Per-frame L1 and SSIM for benchtop vs. tissue-based datasets. Mean L1 error and SSIM as a function of generated frame index across 72 autoregressively generated frames (6 chunks &times; 12 frames each). Mean over 3 generation seeds, each averaged across all evaluated episodes within the category; shaded bands indicate 1 standard deviation across seeds. Left: benchtop datasets (phantom and bench procedures). Right: tissue-based datasets (clinical, cadaver, and ex vivo tissue).
+            </h2>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Video Carousel: Experiment Demos -->
+  <section class="hero is-small is-light">
+    <div class="hero-body">
+      <div class="container">
+        <h2 class="title is-3 has-text-centered">Video Demonstrations</h2>
+        <div id="video-carousel" class="carousel results-carousel">
+
+          <div class="item item-video1">
+            <video poster="" id="video1" class="uniform-video" controls muted loop preload="metadata">
+              <source src="assets/static/videos/end_to_end_suture_example.mp4" type="video/mp4">
+            </video>
+            <h2 class="subtitle has-text-centered">
+              End-to-end autonomous suturing demonstration with GR00T-H.
+            </h2>
+          </div>
+
+          <div class="item item-video2">
+            <video poster="" id="video2" class="uniform-video" controls muted loop preload="metadata">
+              <source src="assets/static/videos/first_pass_comp_clipped.mp4" type="video/mp4">
+            </video>
+            <h2 class="subtitle has-text-centered">
+              Example rollout from GR00T-H on the CMR Versius peg transfer task.
+            </h2>
+          </div>
+
+          <div class="item item-video3">
+            <video poster="" id="video3" class="uniform-video letterbox" controls muted loop preload="metadata">
+              <source src="assets/static/videos/mira_video_cropped.mp4" type="video/mp4">
+            </video>
+            <h2 class="subtitle has-text-centered">
+              Example inference run with GR00T-H post-trained for Virtual Incision MIRA needle pickup.
+            </h2>
+          </div>
+
+          <div class="item item-video4">
+            <video poster="" id="video4" class="uniform-video letterbox" controls muted loop preload="metadata">
+              <source src="assets/static/videos/open_h_c-h-s-s_sample_12k_v1.mp4" type="video/mp4">
+            </video>
+            <h2 class="subtitle has-text-centered">
+              Qualitative results from Cosmos-H-Surgical-Simulator across 30 Open-H datasets, 9 institutions, and 9 embodiments. Each panel shows ground-truth observations (left) alongside model-predicted frames (right), conditioned on recorded kinematic action trajectories.
+            </h2>
+          </div>
+
+          <div class="item item-video5">
+            <video poster="" id="video5" class="uniform-video" controls muted loop preload="metadata">
+              <source src="assets/static/videos/wound_closure_demo.mp4" type="video/mp4">
+            </video>
+            <h2 class="subtitle has-text-centered">
+              Autonomous wound closure demonstration with GR00T-H on ex vivo porcine tissue.
+            </h2>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- BibTeX Citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <div class="bibtex-header">
+        <h2 class="title">BibTeX</h2>
+        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtex-code"><code>@article{openh2026,
+  title={Open-H-Embodiment: A Large-Scale Dataset for Enabling Foundation Models in Medical Robotics},
+  author={Nelson, Nigel and Chen, Juo-Tung and Haworth, Jesse and Chen, Xinhao and Zbinden, Lukas and Huang, Dianye and Abdelaal, Alaa Eldin and Acar, Ayberk and Alambeigi, Farshid and Ao, Yunke and Aranda Rodriguez, Pablo David and Atar, Soofiyan and Ballo, Mattia and Barnes, Noah and Binkiewicz, Filip and Black, Peter and Bodenstedt, Sebastian and Borgioli, Leonardo and Budjak, Nikola and Calm{\'e}, Benjamin and Carrillo, Fabio and Cavalcanti, Nicola and Chen, Changwei and Chen, Haoxin and Chen, Sihang and Chen, Qihan and Chen, Zhongyu and Chen, Ziyang and Cheng, Shing Shin and Cheng, Meiqing and Cheng, Min and Chiu, Zih-Yun Sarah and Chu, Xiangyu and Correa-Gallego, Camilo and Dagnino, Giulio and Deguet, Anton and Delgado, Jacob and DeLong, Jonathan C. and Deng, Kaizhong and Dimitrakakis, Alexander and Ding, Qingpeng and Ding, Hao and Donoho, Daniel and Duan, Anqing and Esposito, Marco and Farritor, Shane and Fayad, Jad and Fayad, Zahi and Ferradosa, Mario and Filicori, Filippo and Finn, Chelsea and F{\"u}rnstahl, Philipp and Ge, Jiawei and Giannarou, Stamatia and Giralt Ludevid, Xavier and Giraud, Frederic and Godbole, Aditya Amit and Goldberg, Ken and Goldenberg, Antony and Granero Marana, Diego and Guo, Xiaoqing and Haidegger, Tam{\'a}s and Hailey, Evan and Hansen, Pascal and Hari, Kush and Hawkins, Jonathon and Haworth, Shelby and Hellig, Ortrun and Herrell, S. Duke and Hong, Zhouyang and Howe, Andrew and Hu, Junlei and Jain, Ria and Rafiee Javazm, Mohammad and Ji, Howard and Ji, Rui and Ji, Jianmin and Jiang, Zhongliang and Jones, Dominic and Jopling, Jeffrey and Jordan, Britton and Ju, Ran and Kam, Michael and Kang, Luoyao and Kang, Fausto and Kapuria, Siddhartha and Kazanzides, Peter and Kiehler, Sonika and Kilmer, Ethan and Kim, Ji Woong (Brian) and Korzeniowski, Przemys{\l}aw and Kuchi, Chandra and Kumar, Nithesh and Kuntz, Alan and Lee, Yu Chung and Lee, Hao-Chih and Li, Hang and Li, Zhen and Liang, Xiao and Lin, Xinxin and Lin, Jinsong and Liu, Chang and Liu, Fei and Liu, Pei and Liu, Yun-hui and Liuchen, Wanli and Luk{\'a}cs, Eszter and Mann, Sareena and Mannas, Miles and Marinelli, Brett and Martyniak, Sabina and Marzola, Francesco and Mazza, Lorenzo and Mei, Xueyan and Morais, Maria Clara and Narayanaswamy, Chetan Reddy and Naskr{\k{e}}t, Micha{\l} and Navarro-Alarcon, David and Nazmuz, Sayem and Neary, Cyrus and Ng, Chi Kit and Nguan, Christopher and Noonan, David and Oh, Ki Hwan and Olesch, Tom Christian and Okamura, Allison M. and Opfermann, Justin and Pescio, Matteo and Pham, Doan Xuan Viet and Porras, Tito and Ren, Hongliang and Rodriguez Jimenez, Ariel and Rodriguez y Baena, Ferdinando and Salcudean, Septimiu E. and Sathya, Asmitha and Satish, Preethi and Seenivasan, Lalithkumar and Shao, Jiaqi and Shen, Yiqing and Sheng, Yu and Shi, Lucy XiaoYang and Soul{\'e}, Zoe and Speidel, Stefanie and Su, Jianhao and Sunmola, Idris and Tak{\'a}cs, Krist{\'o}f and Tang, Yunxi and Thornycroft, Patrick and Tian, Yu and Thompson, Jordan and Turkcan, Mehmet K. and Unberath, Mathias and Valdastri, Pietro and Vives, Carlos and Vuong, Quan and Wagner, Martin and Wang, Farong and Wang, Wei and Wang, Lidian and Wang, Chung-Pang and Wang, Junyi and Wang, Erqi and Wang, Ziyi and Watts, Tanner and Wein, Wolfgang and Wu, Yimeng and Wu, Zijian and Wu, Hongjun and Wu, Luohong and Wu, Jie Ying and Wu, Junlin and Wu, Victoria and Wu, Kaixuan and W{\'o}jcikowski, Mateusz and Xiao, Yunye and Xiao, Nan and Xie, Wenxuan and Yang, Hao and Yang, Tianqi and Yang, Yinuo and Ye, Menglong and Yeung, Ryan S. and Yilmaz, Nural and Yin, Chim Ho and Yip, Michael and Younis, Rayan and Yu, Chenhao and Zefran, Milos and Zhang, Han and Zhang, Yuelin and Zhang, Yidong and Zhang, Yanyong and Zhang, Xuyang and Zhang, Yameng and Zhang, Joyce and Zhong, Ning and Zhou, Peng and Zhou, Haoying and Zuo, Xiuli and Navab, Nassir and Azizian, Mahdi and Huver, Sean D. and Krieger, Axel},
+  year={2026},
+  url={https://open-h.github.io}
+}</code></pre>
+    </div>
+  </section>
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+              This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  </main>
+  </body>
+</html>
